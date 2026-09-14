@@ -1,0 +1,27 @@
+# Veridoc — Python dependencies for the modules built so far.
+# Install PyTorch FIRST (CPU or CUDA build — see README), then:
+#   pip install -r requirements.txt
+# Libraries for later modules (LlamaIndex, Gemini, Gradio) are added when
+# those modules are built, so this file never lists unused packages.
+
+# --- PDF ingestion ---
+pdfplumber>=0.11        # word-level text + bounding boxes (PyPDF2 has no coordinates)
+pdf2image>=1.17         # PDF page -> PIL image for LayoutLMv3's vision input (needs Poppler)
+Pillow>=10.0            # image type used by pdf2image and HuggingFace processors
+
+# --- Models ---
+torch>=2.6             # tensor runtime for LayoutLMv3 / MiniLM; >=2.6 required by
+                        # transformers to safely load .bin checkpoints
+transformers>=4.45      # LayoutLMv3 model + processor, tokenizers
+sentence-transformers>=3.0  # bi-encoder embeddings with pooling + normalization built in
+
+# --- Generation ---
+llama-index-llms-google-genai>=0.11  # LlamaIndex LLM interface for Gemini (pulls in
+                                     # llama-index-core + google-genai); provider-swappable
+python-dotenv>=1.0      # loads GOOGLE_API_KEY from a local .env file, kept out of the code
+
+# --- Storage ---
+chromadb>=0.5           # local persistent vector DB with metadata filtering
+
+# --- Dev ---
+pytest>=8.0             # test runner (tests/ is built in step 12)
