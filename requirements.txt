@@ -14,14 +14,25 @@ torch>=2.6             # tensor runtime for LayoutLMv3 / MiniLM; >=2.6 required 
                         # transformers to safely load .bin checkpoints
 transformers>=4.45      # LayoutLMv3 model + processor, tokenizers
 sentence-transformers>=3.0  # bi-encoder embeddings with pooling + normalization built in
+sentencepiece>=0.2      # DeBERTa-v3's NLI tokenizer is SentencePiece-based and some
+protobuf>=4.25          # checkpoints ship no tokenizer.json; transformers needs both
+                        # to build it, and fails with a confusing error without them
 
 # --- Generation ---
 llama-index-llms-google-genai>=0.11  # LlamaIndex LLM interface for Gemini (pulls in
                                      # llama-index-core + google-genai); provider-swappable
 python-dotenv>=1.0      # loads GOOGLE_API_KEY from a local .env file, kept out of the code
 
+# --- UI ---
+gradio>=6.0             # web UI; one function per event (Streamlit re-runs the whole script).
+                        # v6 API: theme/css belong to launch(), not Blocks(). Brings pandas.
+
 # --- Storage ---
 chromadb>=0.5           # local persistent vector DB with metadata filtering
 
+# --- Notebooks ---
+matplotlib>=3.8         # static charts saved inside the .ipynb (render on GitHub without a kernel)
+ipykernel>=6.29         # lets VS Code / Jupyter run the notebooks with this venv
+
 # --- Dev ---
-pytest>=8.0             # test runner (tests/ is built in step 12)
+pytest>=8.0             # test runner

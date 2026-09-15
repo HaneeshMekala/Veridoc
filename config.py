@@ -243,6 +243,26 @@ RETRIEVAL_MIN_CHUNK_TOKENS = 5
 RETRIEVAL_MIN_SCORE = 0.25
 
 # ---------------------------------------------------------------------------
+# RE-RANKING
+# ---------------------------------------------------------------------------
+
+# WHY RE-RANK (measured on data/eval/metformin_questions.json, 18 questions):
+#   MiniLM alone:            hit@1 0.28  hit@5 0.67  MRR 0.47
+#   + cross-encoder rerank:  hit@1 0.67  hit@5 0.94  MRR 0.79   (+31 ms/query)
+# In a single-drug document EVERY chunk mentions "metformin", so bi-encoder
+# scores bunch up in a 0.58–0.66 band and a 2-word chunk "METFORMIN
+# HYDROCHLORIDE" can outrank the real answer. A cross-encoder reads question
+# and passage together and ranks by whether the passage ANSWERS the question.
+# ms-marco-MiniLM-L-6-v2 is trained on 500k real search queries (MS MARCO),
+# 22M params — small enough to re-rank 20 passages in ~30 ms on a laptop GPU.
+RERANKER_MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+# How many bi-encoder hits the re-ranker re-orders before the top-k are kept.
+# The re-ranker can only promote what the bi-encoder found: at 20 candidates
+# every eval question's answer is in the pool; the cost grows linearly.
+RERANK_CANDIDATES = 20
+
+# ---------------------------------------------------------------------------
 # LLM (Gemini Flash)
 # ---------------------------------------------------------------------------
 
@@ -309,9 +329,36 @@ NLI_MODEL_NAME = "cross-encoder/nli-deberta-v3-small"
 # Below this = flag as potentially hallucinated.
 NLI_ENTAILMENT_THRESHOLD = 0.5
 
-# NLI models output 3 scores summing to 1.0: [contradiction, neutral, entailment]
-# The index of "entailment" in the output array for this specific model.
-NLI_ENTAILMENT_INDEX = 2
+# The position of "entailment" in the model's 3-score output.
+#
+# GOTCHA — label order is NOT standard across NLI models:
+#   roberta-large-mnli, facebook/bart-large-mnli : [contradiction, neutral, entailment] -> 2
+#   cross-encoder/nli-deberta-v3-*               : [contradiction, entailment, neutral] -> 1
+# Reading the wrong index does not crash. It silently reports the NEUTRAL
+# probability as "entailment", so unsupported claims pass as grounded and the
+# whole hallucination check becomes decoration. This is the kind of bug that
+# survives to production because every number still looks plausible.
+#
+# src/hallucination.py therefore reads the order from the model's OWN
+# config.id2label at load time and only falls back to this value if the
+# checkpoint ships no label names.
+NLI_ENTAILMENT_INDEX = 1
+
+# Position of "contradiction". Both families above put it at 0; like the index
+# above, this is only a fallback — id2label wins when the checkpoint has it.
+NLI_CONTRADICTION_INDEX = 0
+
+# How many (evidence, claim) pairs to score in one forward pass.
+# A cross-encoder scores every claim against every passage, so a 6-sentence
+# answer over 5 passages is already 30 pairs. Batching turns that into 2
+# forward passes instead of 30. 16 is comfortable for CPU RAM with a
+# 140M-parameter DeBERTa-small.
+NLI_BATCH_SIZE = 16
+
+# Longest (evidence + claim) pair fed to the NLI model, in tokens.
+# Chunks are capped at MAX_CHUNK_TOKENS (250) and a claim is one sentence, so
+# 512 is ample; it exists to bound worst-case memory, not to truncate normally.
+NLI_MAX_SEQ_LENGTH = 512
 
 # ---------------------------------------------------------------------------
 # LOGGING (SQLite)
@@ -323,6 +370,12 @@ NLI_ENTAILMENT_INDEX = 2
 # "Which questions get the most hallucinated answers?"
 # "Which document regions are retrieved most often?"
 SQLITE_DB_PATH = ROOT_DIR / "data" / "query_log.db"
+
+# How long a write waits for another writer's lock before failing, in seconds.
+# SQLite allows one writer at a time. If two Gradio requests finish at the same
+# moment, the second waits instead of failing with "database is locked".
+# A log write takes ~milliseconds, so 10 s is only ever hit if something hangs.
+SQLITE_BUSY_TIMEOUT_S = 10.0
 
 # ---------------------------------------------------------------------------
 # GRADIO UI
