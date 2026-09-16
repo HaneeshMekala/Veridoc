@@ -1,0 +1,54 @@
+{
+ "document": "metformin_er_fda_label.pdf",
+ "description": "Labelled claims for evaluating the NLI checker. For each question (all taken from metformin_questions.json, so their evidence phrases are known), three claims: 'grounded' = a paraphrase of what the label says; 'contradicted' = a fact or number changed so the label refutes it; 'unsupported' = plausible-sounding but absent from the label (the typical LLM hallucination). Labels were written by the project author from the label text - one annotator, no adjudication.",
+ "items": [
+  {"q": "What is the starting dose?", "claims": [
+   {"text": "The usual starting dose is 500 mg taken once a day with the evening meal.", "gold": "grounded"},
+   {"text": "The starting dose is 1,000 mg taken twice daily.", "gold": "contradicted"},
+   {"text": "The starting dose does not need to be adjusted for body weight.", "gold": "unsupported"}]},
+  {"q": "What is the maximum daily dose?", "claims": [
+   {"text": "The dose should not exceed 2,000 mg per day.", "gold": "grounded"},
+   {"text": "The maximum daily dose is 3,000 mg.", "gold": "contradicted"},
+   {"text": "The maximum dose was established in a trial of 3,000 patients.", "gold": "unsupported"}]},
+  {"q": "How quickly can the dose be increased?", "claims": [
+   {"text": "The dose can be raised by 500 mg every one to two weeks.", "gold": "grounded"},
+   {"text": "The dose can be raised by 1,000 mg every day.", "gold": "contradicted"},
+   {"text": "Dose increases should be supervised by a pharmacist.", "gold": "unsupported"}]},
+  {"q": "When is metformin contraindicated?", "claims": [
+   {"text": "Metformin must not be used in patients with severe renal impairment.", "gold": "grounded"},
+   {"text": "Metformin is safe for patients with severe renal impairment.", "gold": "contradicted"},
+   {"text": "Metformin is contraindicated in patients with asthma.", "gold": "unsupported"}]},
+  {"q": "What are the symptoms of lactic acidosis?", "claims": [
+   {"text": "Symptoms of lactic acidosis include malaise, myalgias and abdominal pain.", "gold": "grounded"},
+   {"text": "Lactic acidosis never causes abdominal pain.", "gold": "contradicted"},
+   {"text": "Lactic acidosis commonly causes blurred vision.", "gold": "unsupported"}]},
+  {"q": "How should suspected lactic acidosis be treated?", "claims": [
+   {"text": "If lactic acidosis is suspected, prompt hemodialysis is recommended.", "gold": "grounded"},
+   {"text": "If lactic acidosis is suspected, metformin treatment should be continued.", "gold": "contradicted"},
+   {"text": "Suspected lactic acidosis should be treated with intravenous insulin.", "gold": "unsupported"}]},
+  {"q": "How often should vitamin B12 be monitored?", "claims": [
+   {"text": "Vitamin B12 levels should be measured every 2 to 3 years.", "gold": "grounded"},
+   {"text": "Vitamin B12 levels should be measured every week.", "gold": "contradicted"},
+   {"text": "Vitamin B12 supplements should be given to all patients.", "gold": "unsupported"}]},
+  {"q": "What are the most common side effects?", "claims": [
+   {"text": "Diarrhea and nausea are among the most common adverse reactions.", "gold": "grounded"},
+   {"text": "Diarrhea is a rare side effect of metformin.", "gold": "contradicted"},
+   {"text": "Hair loss is one of the most common side effects.", "gold": "unsupported"}]},
+  {"q": "Is it safe for children?", "claims": [
+   {"text": "Safety and effectiveness in pediatric patients have not been established.", "gold": "grounded"},
+   {"text": "The extended-release tablets are proven safe and effective in children.", "gold": "contradicted"},
+   {"text": "Children should take the tablets only with milk.", "gold": "unsupported"}]},
+  {"q": "How does metformin work?", "claims": [
+   {"text": "Metformin decreases the amount of glucose produced by the liver.", "gold": "grounded"},
+   {"text": "Metformin works by increasing insulin secretion.", "gold": "contradicted"},
+   {"text": "Metformin works by blocking carbohydrate digestion in the stomach.", "gold": "unsupported"}]},
+  {"q": "How should the tablets be stored?", "claims": [
+   {"text": "The tablets should be stored at room temperature, between 20 and 25 °C.", "gold": "grounded"},
+   {"text": "The tablets must be stored in a freezer below -10 °C.", "gold": "contradicted"},
+   {"text": "The tablets remain stable for five years after the bottle is opened.", "gold": "unsupported"}]},
+  {"q": "Can I drink alcohol while taking metformin?", "claims": [
+   {"text": "Patients should avoid drinking a lot of alcohol while taking metformin.", "gold": "grounded"},
+   {"text": "Drinking large amounts of alcohol is recommended while taking metformin.", "gold": "contradicted"},
+   {"text": "One glass of red wine per day lowers the risk of side effects.", "gold": "unsupported"}]}
+ ]
+}
