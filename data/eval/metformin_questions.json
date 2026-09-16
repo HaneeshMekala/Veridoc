@@ -1,0 +1,123 @@
+{
+ "document": "metformin_er_fda_label.pdf",
+ "description": "Retrieval evaluation set for the sample FDA label. A retrieved chunk counts as relevant if its text (lower-cased, whitespace collapsed) contains any 'gold' phrase. Questions are phrased as a user would ask, not copied from the label. Gold phrases were widened once, after inspecting results, for two questions whose correct patient-information wording the original phrase missed (storage, alcohol); all variants were re-scored with the same set.",
+ "questions": [
+  {
+   "q": "What is the starting dose?",
+   "gold": [
+    "starting dose: 500 mg",
+    "recommended starting dose of metformin"
+   ]
+  },
+  {
+   "q": "What is the maximum daily dose?",
+   "gold": [
+    "maximum of 2,000 mg"
+   ]
+  },
+  {
+   "q": "How quickly can the dose be increased?",
+   "gold": [
+    "increments of 500 mg every 1 to 2 weeks"
+   ]
+  },
+  {
+   "q": "When is metformin contraindicated?",
+   "gold": [
+    "contraindicated in patients with",
+    "known hypersensitivity to metformin"
+   ]
+  },
+  {
+   "q": "Can patients with severe kidney disease take this drug?",
+   "gold": [
+    "egfr below 30"
+   ]
+  },
+  {
+   "q": "Should treatment be started in a patient with an eGFR of 40?",
+   "gold": [
+    "between 30 to 45",
+    "between 30 and 45"
+   ]
+  },
+  {
+   "q": "What should be done before an iodinated contrast imaging procedure?",
+   "gold": [
+    "prior to, an iodinated contrast",
+    "prior to an iodinated contrast"
+   ]
+  },
+  {
+   "q": "What are the symptoms of lactic acidosis?",
+   "gold": [
+    "malaise, myalgias"
+   ]
+  },
+  {
+   "q": "What are the risk factors for lactic acidosis?",
+   "gold": [
+    "risk factors include renal impairment",
+    "risk factors for metformin-associated lactic acidosis include"
+   ]
+  },
+  {
+   "q": "How should suspected lactic acidosis be treated?",
+   "gold": [
+    "prompt hemodialysis is recommended"
+   ]
+  },
+  {
+   "q": "How often should vitamin B12 be monitored?",
+   "gold": [
+    "at 2 to 3 year intervals"
+   ]
+  },
+  {
+   "q": "Does it cause low blood sugar when combined with insulin?",
+   "gold": [
+    "hypoglycemia when used in combination with insulin"
+   ]
+  },
+  {
+   "q": "What are the most common side effects?",
+   "gold": [
+    "diarrhea, and nausea",
+    "diarrhea and nausea"
+   ]
+  },
+  {
+   "q": "Is it safe for children?",
+   "gold": [
+    "pediatric patients have not been established"
+   ]
+  },
+  {
+   "q": "How does metformin work?",
+   "gold": [
+    "decreases hepatic glucose production"
+   ]
+  },
+  {
+   "q": "How should the tablets be stored?",
+   "gold": [
+    "store at 20",
+    "room temperature between 20"
+   ]
+  },
+  {
+   "q": "What happens in an overdose?",
+   "gold": [
+    "overdose of metformin hcl has occurred"
+   ]
+  },
+  {
+   "q": "Can I drink alcohol while taking metformin?",
+   "gold": [
+    "alcohol can potentiate the effect of metformin",
+    "do not drink a lot of alcoholic drinks",
+    "excessive alcohol intake while receiving"
+   ]
+  }
+ ]
+}

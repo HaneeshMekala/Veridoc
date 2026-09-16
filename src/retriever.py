@@ -19,17 +19,21 @@ embeddings, ChromaDB's filter language and score thresholds.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from config import (
     REGION_LABELS,
     RETRIEVAL_EXCLUDED_LABELS,
     RETRIEVAL_MIN_CHUNK_TOKENS,
     RETRIEVAL_MIN_SCORE,
+    RERANK_CANDIDATES,
     TOP_K_RETRIEVAL,
 )
 from src.embedder import Embedder
 from src.vectorstore import RetrievedChunk, VectorStore
+
+if TYPE_CHECKING:                    # type hints only — see embedder.py for why
+    from src.reranker import Reranker
 
 
 # INTERVIEW ALERT — "What happens when the answer is NOT in the documents?"
@@ -52,7 +56,7 @@ class Retriever:
     the 90MB model is loaded once, and tests can pass in small fakes.
 
     Usage:
-        retriever = Retriever(embedder, store)
+        retriever = Retriever(embedder, store, reranker=Reranker())
         hits = retriever.retrieve("What is the maximum daily dose?",
                                   region_types=["table", "text"])
     """
@@ -62,18 +66,22 @@ class Retriever:
         embedder: Embedder,
         store: VectorStore,
         min_score: float = RETRIEVAL_MIN_SCORE,
+        reranker: Reranker | None = None,
     ) -> None:
         """
-        Store references to the shared embedder and vector store.
+        Store references to the shared embedder, vector store and re-ranker.
 
         Args:
             embedder:  Loaded Embedder (the SAME model used at indexing time).
             store:     Opened VectorStore holding the indexed chunks.
-            min_score: Relevance floor; hits below it are discarded.
+            min_score: Relevance floor on cosine similarity; hits below it
+                       are discarded.
+            reranker:  Optional cross-encoder. None = bi-encoder order only.
         """
         self.embedder = embedder
         self.store = store
         self.min_score = min_score
+        self.reranker = reranker
 
     def retrieve(
         self,
@@ -91,8 +99,16 @@ class Retriever:
             and — for off-topic questions — 5 irrelevant chunks that the LLM
             will treat as evidence.
         BETTER APPROACH (what we do):
-            Filter noise INSIDE the search (so we still get top_k good hits),
-            then drop anything below the relevance floor.
+            1. Filter noise INSIDE the search (so we still get enough hits).
+            2. Drop anything below the relevance floor.
+            3. With a re-ranker: fetch RERANK_CANDIDATES, re-order them by
+               cross-encoder relevance, keep the best top_k.
+
+        WHY THE FLOOR COMES BEFORE RE-RANKING:
+        The floor decides "is anything here relevant at all?" — the abstention
+        decision. It stays on the cosine score, whose range was MEASURED
+        (relevant 0.57–0.90, off-topic <= 0.13). The re-ranker's scores are
+        uncalibrated logits: excellent for ordering, unsafe as a cut-off.
 
         Args:
             query:        The user's question.
@@ -109,8 +125,12 @@ class Retriever:
         """
         where = build_where_filter(region_types, doc_ids)
         query_vec = self.embedder.embed_query(query)
-        hits = self.store.query(query_vec, top_k=top_k, where=where)
-        return [h for h in hits if h.score >= self.min_score]
+        pool = max(top_k, RERANK_CANDIDATES) if self.reranker else top_k
+        hits = self.store.query(query_vec, top_k=pool, where=where)
+        hits = [h for h in hits if h.score >= self.min_score]
+        if self.reranker:
+            hits = self.reranker.rerank(query, hits)
+        return hits[:top_k]
 
 
 # ---------------------------------------------------------------------------

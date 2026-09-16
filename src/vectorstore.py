@@ -69,6 +69,8 @@ class RetrievedChunk:
         region_label: LayoutLMv3 region type ("table", "text", ...).
         bbox:         [x0, y0, x1, y1] of the source region on the page.
         score:        Cosine similarity to the query, in [-1, 1]; higher = closer.
+        rerank_score: Cross-encoder relevance (src/reranker.py), or None if the
+                      hit was not re-ranked. Uncalibrated: compare, don't threshold.
     """
     chunk_id: str
     text: str
@@ -77,6 +79,7 @@ class RetrievedChunk:
     region_label: str
     bbox: list[float]
     score: float
+    rerank_score: float | None = None
 
 
 # ---------------------------------------------------------------------------
